@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:stm32="https://developer.st.com/schemas/stm32cube/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.7.55" xsi:noNamespaceSchemaLocation="PACK.xsd" xsi:schemaLocation="https://developer.st.com/schemas/stm32cube/1.0.0 stm32cube.xsd">
+  <vendor>STMicroelectronics</vendor>
+  <name>button_part_drivers</name>
+  <description>Button Part Drivers SW Pack</description>
+  <url>https://developer.st.com/st-pack-server/api/v1/pack/</url>
+  <repository type="git">https://github.com/STMicroelectronics/stm32-button-part-drivers</repository>
+  <supportContact/>
+  <license>LICENSE.md</license>
+  <environments>
+    <environment name="STM32Cube">
+      <stm32:pack type="PARTDRV" friendlyName="button" shortDesc="button part driver">
+        <relocation-info parent="part_drivers" layer="" element=""/>
+        <compatibility>
+          <release version="2.0.0">
+            <applicable-schema schemaType="sw-configuration" schemaVersion="3.7.0"/>
+            <applicable-api-group apiType="codegen-getters">
+              <applicable-api apiType="ExtiAPI" apiVersion="1.0.0"/>
+              <applicable-api apiType="pinoutAPI" apiVersion="1.0.0"/>
+              <applicable-api apiType="SWConfigurationAPI" apiVersion="1.0.0"/>
+            </applicable-api-group>
+          </release>
+        </compatibility>
+      </stm32:pack>
+    </environment>
+  </environments>
+  <ECCN>
+    <ECCN-EU>NEC</ECCN-EU>
+    <ECCN-US>EAR99</ECCN-US>
+  </ECCN>
+  <changelogs>
+    <changelog id="Release Notes" name="Release_Notes.html"/>
+  </changelogs>
+  <releases>
+    <release version="2.0.0" date="2026-02-17">
+      Refer to Release_Notes.md for release details.
+    </release>
+  </releases>
+  <keywords>
+    <keyword>STMicroelectronics</keyword>
+    <keyword>ST</keyword>
+    <keyword>STM32</keyword>
+    <keyword>Parts</keyword>
+    <keyword>Drivers</keyword>
+    <keyword>Button</keyword>
+    <keyword>HAL</keyword>
+    <keyword>switch</keyword>
+    <keyword>key</keyword>
+    <keyword>push</keyword>
+    <keyword>knob</keyword>
+    <keyword>dial</keyword>
+    <keyword>toggle</keyword>
+    <keyword>control</keyword>
+  </keywords>
+  <conditions>
+    <condition id="HAL GPIO">
+      <description>STMicroelectronics GPIO HAL Driver</description>
+      <require Cclass="Device" Cgroup="STM32 HAL" Csub="GPIO"/>
+      <require Cclass="Device" Cgroup="STM32 HAL" Csub="EXTI"/>
+    </condition>
+    <condition id="Button CFG Condition">
+      <description>STMicroelectronics configuration for Button part driver</description>
+    </condition>
+  </conditions>
+  <generators>
+    <generator id="button_mx2codegen">
+      <description>ST Microelectronics: STM32 Cube Code Generator for Button Drivers Pack</description>
+      <exe>
+        <command host="win">.config/gen_code.bat</command>
+        <command host="linux">.config/gen_code.sh</command>
+        <command host="mac">.config/gen_code.sh</command>
+        <argument>button_mx2codegen</argument>
+        <argument>$G</argument>
+        <argument>STMicroelectronics.button_part_drivers.gpdsc.hbs</argument>
+        <argument mode="dry-run">--dry-run</argument>
+      </exe>
+      <gpdsc name="$P/STMicroelectronics.button_part_drivers.gpdsc"/>
+    </generator>
+  </generators>
+  <components>
+    <component Cclass="Board Part" Cgroup="Button" Csub="gpio" Cversion="1.0.0" condition="HAL GPIO">
+      <description>Driver for button based on STM32 HAL</description>
+      <files>
+        <file category="doc" name="README.md"/>
+        <file category="doc" name="SW_Security_Level.md"/>
+        <file category="header" name="gpio/button.h"/>
+        <file category="source" name="gpio/button.c"/>
+      </files>
+    </component>
+    <component generator="button_mx2codegen" Cclass="Board Part" Cgroup="STM32CubeMX2 Config" Csub="Button" Cversion="1.0.0" condition="Button CFG Condition" maxInstances="10">
+      <description>Button STM32CubeMX2 Config</description>
+      <environments>
+        <environment name="STM32Cube">
+          <stm32:component>
+            <supported-part-types>
+              <supported-part-type Hclass="Input Devices" Hgroup="Button"/>
+            </supported-part-types>
+          </stm32:component>
+        </environment>
+      </environments>
+      <files>
+        <file category="genAsset" name=".config/gen_code.bat"/>
+        <file category="genAsset" name=".config/gen_code.sh"/>
+        <file category="genAsset" name=".config/STMicroelectronics.button_part_drivers.gpdsc.hbs"/>
+        <file category="genAsset" name=".config/template/mx_button_template.h.hbs"/>
+        <file category="genAsset" name=".config/template/mx_button_template.c.hbs"/>
+        <file category="genAsset" name=".config/template/license/mx_button_part_drivers_license_template.md.hbs"/>
+        <file category="genAsset" name=".config/mx_button_parameters.json"/>
+      </files>
+    </component>
+  </components>
+</package>

@@ -1,0 +1,111 @@
+{{!--
+  ******************************************************************************
+  * file           : mx_button_template.h.hbs
+  * brief          : Code generation for the Button part driver.
+  ******************************************************************************
+  * attention
+  *
+  * Copyright (c) 2026 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+~--}}
+/**
+  ******************************************************************************
+  * file           : mx_button.h
+  * brief          : Code generation for the Button part driver.
+  ******************************************************************************
+  * attention
+  *
+  * Copyright (c) {{#unless (eq 2026 (toInt (year)))}}2026-{{/unless}}{{year}} STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the mx_button_license.md file
+  * in the same directory as the generated code.
+  * If no mx_button_license.md file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+
+{{assign 'button_instances' (@root.SWConfigurationAPI.getInstances  "STMicroelectronics::Board Part:STM32CubeMX2 Config:Button")~}}
+
+/* Define to prevent recursive inclusion ----------------------------------- */
+#ifndef MX_BUTTON_H
+#define MX_BUTTON_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Includes ---------------------------------------------------------------- */
+#include "button.h"
+#include "mx_hal_def.h"
+
+/* Exported macros --------------------------------------------------------- */
+{{#each @root.button_instances}}
+{{assign 'ctx' (@root.SWConfigurationAPI.getSwInstanceConfiguration this)~}}
+{{#with @root.ctx}}
+/* Part Config ID */
+#define BUTTON_{{@index}}                              {{@index}}
+
+{{#if (length info.labels)}}
+/* User-defined aliases for the part drivers instances IDs and getter functions */
+{{else}}
+/* No label has been defined for this part driver instance,
+ * so no alias is generated for BUTTON_{{@index}} or mx_button_{{@index}}_getobject(). */
+{{/if}}
+{{#each info.labels}}
+#define {{this}}                          BUTTON_{{@../index}}
+{{/each}}
+{{#each info.labels}}
+#define {{lowercase this}}_getobject()    mx_button_{{@../index}}_getobject()
+{{/each}}
+
+/* Resource bindings */
+{{#if (eq info.interface 'GPIO')~}}
+{{assign 'gpioSWInstanceId' (@root.SWConfigurationAPI.getBoundSwInstanceId resourcesAllocation.gpioCfg.gpioCfg)~}}
+{{assign 'gpioPinCfg' (@root.SWConfigurationAPI.getPinConfiguration @root.gpioSWInstanceId resourcesAllocation.gpioCfg.gpioCfg.selection)~}}
+{{assign 'gpioPinData' (@root.pinoutAPI.getPinData resourcesAllocation.gpioCfg.gpioCfg.selection)~}}
+
+#define BUTTON_{{@index}}_GPIO_PORT          HAL_GPIO{{@root.gpioPinData.port}}
+#define BUTTON_{{@index}}_GPIO_PIN           HAL_GPIO_PIN_{{@root.gpioPinData.index}}
+#define BUTTON_{{@index}}_GPIO_ACTIVE_STATE  {{resourcesAllocation.gpioCfg.polarity}}
+
+{{assign 'extiLine' (@root.ExtiAPI.getExtiLine resourcesAllocation.gpioCfg.gpioCfg.selection)~}}
+
+{{#if (eq @root.extiLine undefined)}}
+/* The EXTI is not enabled on that pin. BUTTON_{{@index}} must be used in polling mode only. Software debounce is also unavailable. */
+#define BUTTON_{{@index}}_EXTI_GETHANDLE()     NULL
+{{else}}
+#define BUTTON_{{@index}}_EXTI_GETHANDLE()     mx_gpio_default_{{lowercase @root.extiLine}}_gethandle()
+{{/if}}
+
+{{#if (eq resourcesAllocation.gpioCfg.debounceIsEnabled true)~}}
+#define BUTTON_{{@index}}_DEBOUNCE_DURATION  {{resourcesAllocation.gpioCfg.debounceValue}}u
+{{/if}}
+
+{{/if}} {{!-- (eq info.interface 'GPIO') --}}
+
+
+{{/with}} {{!-- @root.ctx.settings.parameters --}}
+{{/each}} {{!-- @root.button_instances --}}
+
+{{!---------------------- Part Getters FUNC --------------------------------------------------}}
+
+/* Exported functions ------------------------------------------------------ */
+{{#each @root.button_instances}}
+{{assign 'ctx' (@root.SWConfigurationAPI.getSwInstanceConfiguration this)~}}
+{{#with @root.ctx}}
+button_t *mx_button_{{@index}}_getobject(void);
+{{/with}} {{!-- @root.ctx.settings.parameters --}}
+{{/each}} {{!-- @root.button_instances --}}
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* MX_BUTTON_H */
